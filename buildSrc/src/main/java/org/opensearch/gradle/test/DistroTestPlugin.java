@@ -71,6 +71,7 @@ import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.function.Predicate;
 import java.util.function.Supplier;
 import java.util.stream.Stream;
 
@@ -130,7 +131,11 @@ public class DistroTestPlugin implements Plugin<Project> {
                 if (distribution.getPlatform() == OpenSearchDistribution.Platform.WINDOWS) {
                     windowsTestTasks.add(destructiveTask);
                 } else {
-                    linuxTestTasks.computeIfAbsent(distribution.getType(), k -> new ArrayList<>()).add(destructiveTask);
+                    var a = linuxTestTasks.computeIfAbsent(distribution.getType(), k -> new ArrayList<>());
+                    Predicate<? super TaskProvider<Test>> predicate = task -> task.getName().equalsIgnoreCase(taskname);
+                    if (a.stream().noneMatch(predicate)) {
+                        a.add(destructiveTask);
+                    }
                 }
                 destructiveDistroTest.configure(t -> t.dependsOn(destructiveTask));
                 lifecycleTasks.get(distribution.getType()).configure(t -> t.dependsOn(destructiveTask));
