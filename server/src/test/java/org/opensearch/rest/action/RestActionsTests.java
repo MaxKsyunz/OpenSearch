@@ -37,6 +37,7 @@ import org.opensearch.action.OriginalIndices;
 import org.opensearch.action.ShardOperationFailedException;
 import org.opensearch.action.search.ShardSearchFailure;
 import org.opensearch.cluster.metadata.IndexMetadata;
+import org.opensearch.common.ParseField;
 import org.opensearch.common.ParsingException;
 import org.opensearch.common.Strings;
 import org.opensearch.common.settings.Settings;
@@ -56,7 +57,13 @@ import org.junit.AfterClass;
 import org.junit.BeforeClass;
 
 import java.io.IOException;
+import java.lang.reflect.Field;
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
+import java.util.List;
+import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import static java.util.Collections.emptyList;
 import static org.hamcrest.CoreMatchers.equalTo;
@@ -120,6 +127,21 @@ public class RestActionsTests extends OpenSearchTestCase {
         }
     }
 
+    public void testMatchQueryBuilderParams() throws IOException,  IllegalArgumentException, IllegalAccessException
+    {
+        Class<?> queryClass = MatchQueryBuilder.class;
+       var fields = Arrays.stream(queryClass.getFields()).filter(f -> f.getType().equals(ParseField.class)).collect(Collectors.toList());
+
+       var values = new ArrayList<>();
+
+       for (var f : fields) {
+           var pf = (ParseField) f.get(null);
+           values.add(pf.getPreferredName());
+       }
+       assertNotNull(fields);
+       assertTrue(fields.size() > 0);
+       assertTrue(values.size() > 0);
+    }
     public void testBuildBroadcastShardsHeader() throws IOException {
         ShardOperationFailedException[] failures = new ShardOperationFailedException[] {
             createShardFailureParsingException("node0", 0, null),
