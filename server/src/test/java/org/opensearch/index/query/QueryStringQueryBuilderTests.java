@@ -68,6 +68,7 @@ import org.apache.lucene.util.automaton.Operations;
 import org.apache.lucene.util.automaton.TooComplexToDeterminizeException;
 import org.opensearch.action.admin.indices.mapping.put.PutMappingRequest;
 import org.opensearch.cluster.metadata.IndexMetadata;
+import org.opensearch.common.ParseField;
 import org.opensearch.common.Strings;
 import org.opensearch.common.compress.CompressedXContent;
 import org.opensearch.common.settings.Settings;
@@ -592,6 +593,7 @@ public class QueryStringQueryBuilderTests extends AbstractQueryTestCase<QueryStr
         );
         assertThat(query, equalTo(expectedQuery));
     }
+
 
     public void testToQueryWilcardQueryWithSynonyms() throws Exception {
         for (Operator op : Operator.values()) {
